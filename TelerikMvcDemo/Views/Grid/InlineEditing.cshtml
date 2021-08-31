@@ -1,0 +1,135 @@
+﻿@{
+    ViewBag.Title = "Grid - Inline Editing";
+}
+
+<script>
+    function productNameTemplate(product) {
+        if (product.Discontinued) {
+            return '<a href="/Products/Details/' + product.ProductID + '" style="color: red;">' + product.ProductName + '</a>';
+        }
+
+        return '<a href="/Products/Details/' + product.ProductID + '">' + product.ProductName + '</a>';
+    }
+</script>
+
+<div class="row">
+    <div class="col-12">
+        @(Html.Kendo().Grid<Product>()
+            .Name("grid")
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.ProductID).Width(100);
+                columns.Bound(p => p.ProductName).ClientTemplate("#=productNameTemplate(data)#");
+                columns.Bound(p => p.CategoryID).ClientTemplate("#=CategoryName#");
+                columns.Bound(p => p.SubCategoryID).ClientTemplate("#=SubCategoryName#").EditorTemplateName("SubCategory");
+                columns.Bound(p => p.UnitPrice).Width(100);
+                columns.Bound(p => p.UnitsInStock).Width(100);
+                columns.Bound(p => p.UnitsOnOrder).Width(100);
+                columns.Bound(p => p.Discontinued).ClientTemplate("#= Discontinued ? '是' : '否'#").Sortable(false).Width(100);
+                columns.Bound(p => p.LastSupply).Format("{0:yyyy/MM/dd}").EditorTemplateName("Date").Width(200);
+                columns.Command(command => {
+                    command.Edit().Text("編輯").UpdateText("更新").CancelText("取消");
+                    command.Destroy().Text("刪除");
+                    command.Custom("details").Text("明細").Click("details");
+                }).Width(250);
+            })
+            .ToolBar(toolbar => {
+                toolbar.Create().Text("新增");
+                toolbar.Custom().Text("回首頁").Action("Index", "Home");
+            })
+            .Pageable()
+            .Sortable()
+            .Editable(editable=> editable.Mode(GridEditMode.InLine))
+            .ClientDetailTemplateId("spec-template")
+            .Events(events => events.BeforeEdit("onBeforeEdit").DataBound("onDataBound"))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(10)
+                .Model(model =>
+                {
+                    model.Id(p => p.ProductID);
+                    model.Field(p => p.ProductID).Editable(false);
+                })
+                .Read(read => read.Action("Read", "Products"))
+                .Create(create => create.Action("Create", "Products"))
+                .Update(update => update.Action("Update", "Products"))
+                .Destroy(update => update.Action("Delete", "Products"))
+                .Events(events => events.Error("error_handler"))
+            )
+        )
+    </div>
+</div>
+
+<script type="text/javascript">
+    function onBeforeEdit(e) {
+        console.log('onBeforeEdit', e);
+    }
+
+    function onDataBound(e) {
+        console.log('onDataBound', e);
+    }
+
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function() {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+    function details(e) {
+        e.preventDefault();
+
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+        var id = dataItem.ProductID;
+
+        var url = '/Products/Details/' + id;
+
+        window.location = url;
+    }
+</script>
+
+<script id="spec-template" type="text/kendo-tmpl">
+    @(Html.Kendo().TabStrip()
+    .Name("tabStrip_#=ProductID#")
+    .SelectedIndex(0)
+    .Animation(animation => animation.Open(open => open.Fade(FadeDirection.In)))
+    .Items(items =>
+    {
+        items.Add().Text("Spec").Content(
+            @<text>
+                @(Html.Kendo().Grid<ProductSpec>()
+                    .Name("grid_#=ProductID#")
+                    .Columns(columns =>
+                    {
+                        columns.Bound(o => o.ProductSpecID).Title("ID").Width(100);
+                        columns.Bound(o => o.SpecName).Width(200);
+                        columns.Bound(o => o.Desctiption);
+                    })
+                    .DataSource(dataSource => dataSource
+                        .Ajax()
+                        .PageSize(5)
+                        .Read(read => read.Action("Get", "ProductSpecs", new { productID = "#=ProductID#" }))
+                    )
+                    .Pageable()
+                    .Sortable()
+                    .ToClientTemplate())
+            </text>
+        );
+
+        items.Add().Text("Category").Content(
+            "<ul>" +
+                "<li><label>UnitPrice:</label>#= UnitPrice #</li>" +
+                "<li><label>UnitsInStock:</label>#= UnitsInStock #</li>" +
+                "<li><label>UnitsOnOrder:</label>#= UnitsOnOrder #</li>" +
+            "</ul>"
+        );
+    })
+    .ToClientTemplate())
+</script>

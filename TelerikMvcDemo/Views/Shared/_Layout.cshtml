@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewBag.Title - My Telerik MVC Application</title>
+    <link href="@Url.Content("~/Content/kendo.bootstrap-v4.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/bootstrap.min.css")" rel="stylesheet" type="text/css" />
+    <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
+    <script src="@Url.Content("~/Scripts/jquery.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/jszip.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo.all.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo.aspnetmvc.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.min.js")"></script>
+    <script src="@Url.Content("~/Scripts/kendo.modernizr.custom.js")"></script>
+</head>
+<body class="k-content">
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid d-flex justify-content-between p-0">
+            <h1 class="navbar-brand d-flex align-items-center">@(ViewBag.Title ?? "Telerik Mvc Demo")</h1>
+            <button id="configure" class="k-rpanel-toggle k-button k-primary btn-toggle">
+                <span class="k-icon k-i-menu"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div id="responsive-panel" class="navbar navbar-dark bg-light">
+        <ul id="menu" style="width: 100%">
+            <li>@Html.ActionLink("Local Binding", "LocalBinding", "Grid")</li>
+            <li>@Html.ActionLink("Remote Binding", "RemoteBinding", "Grid")</li>
+            <li>@Html.ActionLink("Web Api Binding", "WebApiBinding", "Grid")</li>
+
+            <li>@Html.ActionLink("Batch Editing", "BatchEditing", "Grid")</li>
+            <li>@Html.ActionLink("Inline Editing", "InlineEditing", "Grid")</li>
+            <li>@Html.ActionLink("Popup Editing", "PopupEditing", "Grid")</li>
+        </ul>
+    </div>
+
+    <main>
+        <div class="container-fluid p-3">
+            @RenderBody()
+        </div>
+    </main>
+
+    <footer class="footer text-center d-flex align-items-center">
+        <div class="container-fluid">
+            <p class="text-muted">Copyright © @DateTime.Now.Year Progress Software Corporation and/or its subsidiaries or affiliates. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        $(document).ready(function () {
+            $("#responsive-panel").kendoResponsivePanel({
+                breakpoint: 768,
+                autoClose: false,
+                orientation: "top"
+            });
+            $("#menu").kendoMenu();
+        });
+        function onclick(e) {
+            $("#responsive-panel").getKendoResponsivePanel().toggle();
+        }
+    </script>
+</body>
+</html>

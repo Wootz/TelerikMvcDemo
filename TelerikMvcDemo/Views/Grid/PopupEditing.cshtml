@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "Grid - Popup Editing";
+}
+
+<div class="row">
+    <div class="col-12">
+        @(Html.Kendo().Grid<Product>()
+            .Name("grid")
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.ProductID).Width(100);
+                columns.Bound(p => p.ProductName);
+                columns.Bound(p => p.CategoryID);
+                columns.Bound(p => p.SubCategoryID);
+                columns.Bound(p => p.UnitPrice).Width(100);
+                columns.Bound(p => p.UnitsInStock).Width(100);
+                columns.Bound(p => p.UnitsOnOrder).Width(100);
+                columns.Bound(p => p.Discontinued).Sortable(false).Width(100);
+                columns.Bound(p => p.LastSupply).Format("{0:yyyy/MM/dd}").Width(200);
+                columns.Command(command => {
+                    command.Edit().Text("編輯").UpdateText("更新").CancelText("取消");
+                    command.Destroy().Text("刪除");
+                }).Width(250);
+            })
+            .ToolBar(toolbar => toolbar.Create().Text("新增"))
+            .Pageable()
+            .Sortable()
+            .Editable(editable=> editable.Mode(GridEditMode.PopUp))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .PageSize(10)
+                .Model(model => {
+                    model.Id(p => p.ProductID);
+                    model.Field(p => p.ProductID).Editable(false);
+                })
+                .Read(read => read.Action("Read", "Products"))
+                .Create(create => create.Action("Create", "Products"))
+                .Update(update => update.Action("Update", "Products"))
+                .Destroy(update => update.Action("Delete", "Products"))
+                .Events(events => events.Error("error_handler"))
+            )
+        )
+    </div>
+</div>
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function() {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+</script>

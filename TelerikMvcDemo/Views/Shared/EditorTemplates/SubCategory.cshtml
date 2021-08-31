@@ -1,0 +1,43 @@
+﻿@model int?
+
+@{
+    var cascadeFrom = ViewData["cascadeFrom"] as string;
+    var onChange = ViewData["onChange"] as string;
+    var htmlAttributes = ViewData["htmlAttributes"];
+}
+
+<script>
+    function filter(e) {
+        var filters = e.filter.filters;
+        if (!filters) {
+            return {};
+        }
+
+        var result = {};
+        for (var i = 0; i < filters.length; i++) {
+            result[filters[i].field] = filters[i].value;
+        }
+
+        return result;
+    }
+</script>
+
+@(Html.Kendo().DropDownListFor(m => m)
+    .DataValueField("SubCategoryID")
+    .DataTextField("SubCategoryName")
+    .OptionLabel("請選擇")
+    .DataSource(source => source
+        .Read(read => read.Url("/api/Products/GetSubCategories").Data("filter")) // 傳遞額外參數至後端
+        .ServerFiltering(true) // 啟用 Server Filtering
+    )
+    .AutoBind(false) // 關閉 Auto Binding
+    .CascadeFrom(cascadeFrom)
+    .Events(events =>
+    {​​​​​​​​​​​​​​​
+        if (string.IsNullOrEmpty(onChange) == false)
+        {​​​​​​​​​​​​​​​​​​​​​​
+            events.Change(onChange);
+        }​​​​​​​​​​​​​​​​​​​​​​
+    }​​​​​​​​​​​​​​​​​​​​​​)
+    .HtmlAttributes(htmlAttributes)
+)

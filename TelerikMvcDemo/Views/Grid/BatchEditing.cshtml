@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "Grid - Batch Editing";
+}
+
+<div class="row">
+    <div class="col-12">
+        @(Html.Kendo().Grid<Product>()
+            .Name("grid")
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.ProductID).Width(100);
+                columns.Bound(p => p.ProductName);
+                columns.Bound(p => p.CategoryID)
+                    //.ClientTemplate("#=CategoryName#")
+                    .EditorViewData(new {​​​​​​ onChange = "onCategoryChange" }​​​​​​)
+                    .HtmlAttributes(new {​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​ @class = "category-cell" }​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​);
+                columns.Bound(p => p.SubCategoryID)
+                    //.ClientTemplate("#=SubCategoryName#")
+                    .EditorTemplateName("SubCategory")
+                    .HtmlAttributes(new {​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​ @class = "sub-category-cell" }​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​);
+                columns.Bound(p => p.UnitPrice).Width(100);
+                columns.Bound(p => p.UnitsInStock).Width(100);
+                columns.Bound(p => p.UnitsOnOrder).Width(100);
+                columns.Bound(p => p.Discontinued).Sortable(false).Width(100);
+                columns.Bound(p => p.LastSupply).Format("{0:yyyy/MM/dd}").Width(200);
+                columns.Command(command => command.Destroy().Text("刪除")).Width(100);
+            })
+            .ToolBar(toolbar => {
+                toolbar.Create().Text("新增");
+                toolbar.Save().Text("儲存").SaveText("儲存").CancelText("取消");
+            })
+            .Pageable()
+            .Sortable()
+            .Editable(editable=> editable.Mode(GridEditMode.InCell))
+            .Events(e => e.Edit("onEdit"))
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .Batch(true)
+                .PageSize(10)
+                .Model(model =>
+                {
+                    model.Id(p => p.ProductID);
+                    model.Field(p => p.ProductID).Editable(false);
+                })
+                .Read(read => read.Action("Read", "Products"))
+                .Create(create => create.Action("CreateRange", "Products"))
+                .Update(update => update.Action("UpdateRange", "Products"))
+                .Destroy(update => update.Action("DeleteRange", "Products"))
+                .Events(events => events.Error("error_handler"))
+            )
+        )
+    </div>
+</div>
+
+<script type="text/javascript">
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+    function onEdit(e) {
+        // 編輯子類別時，才從 Server 取得篩選過的資料
+        var editForm = e.container; // 取得表單
+        var model = e.model; // 取得資料
+
+        var subCatetory = editForm.find('#SubCategoryID'); // 子類別選單
+        if (subCatetory.length) { // 編輯子類別時生效
+            // 設定 filter
+            var dataSource = subCatetory.data('kendoDropDownList').dataSource;
+            dataSource.filter({ field: 'CategoryID', value: model.CategoryID, operator: 'eq' } );
+            dataSource.read();
+        }
+    }
+
+    function onCategoryChange(e) {
+        var tr = $(e.sender.element).closest('tr');
+
+        var grid = $('#grid').data('kendoGrid');
+        var dataItem = grid.dataItem(tr);
+
+        var dropdownlist = $(e.sender.element).data('kendoDropDownList');
+        var categoryName = dropdownlist.text();
+
+        dataItem.set('CategoryName', categoryName);
+
+        // 清除 SubCategory
+        dataItem.set('SubCategoryID', 0);
+
+        // 設定 SubCategory 成編輯模式
+        grid.editCell(tr.find('.sub-category-cell'));
+    }
+</script>

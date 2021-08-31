@@ -1,0 +1,34 @@
+﻿@model IEnumerable<Product>
+
+@{
+    ViewBag.Title = "Grid - Local Data";
+}
+
+<div class="row">
+    <div class="col-12">
+        @(Html.Kendo().Grid<Product>(Model)
+            .Name("grid")
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.ProductID)
+                    //.Template(@<text>@item.ProductID - @item.ProductName</text>)
+                    .Width(200);
+                columns.Bound(p => p.ProductName);
+                columns.Bound(p => p.CategoryID);
+                columns.Bound(p => p.SubCategoryID);
+                columns.Bound(p => p.UnitPrice).Width(100);
+                columns.Bound(p => p.UnitsInStock).Width(100);
+                columns.Bound(p => p.UnitsOnOrder).Width(100);
+                columns.Bound(p => p.Discontinued).Sortable(false).Width(100);
+                columns.Bound(p => p.LastSupply).Format("{0:yyyy/MM/dd}").Width(200);
+            })
+            .Pageable()
+            .Sortable()
+            .DataSource(dataSource => dataSource
+                .Server()
+                .Total((int)ViewBag.Total)
+                .PageSize(10)
+            )
+        )
+    </div>
+</div>

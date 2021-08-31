@@ -1,0 +1,21 @@
+﻿@model int?
+
+@{
+    var onChange = ViewData["onChange"] as string;
+    var htmlAttributes = ViewData["htmlAttributes"];
+}
+
+@(Html.Kendo().DropDownListFor(m => m)
+    .DataValueField("CategoryID")
+    .DataTextField("CategoryName")
+    .OptionLabel("請選擇")
+    .Events(events =>
+    {​​​​​​​​​​​​​​​
+        if (string.IsNullOrEmpty(onChange) == false)
+        {​​​​​​​​​​​​​​​​​​​​​​
+            events.Change(onChange);
+        }​​​​​​​​​​​​​​​​​​​​​​
+    }​​​​​​​​​​​​​​​​​​​​​​)
+    .HtmlAttributes(htmlAttributes)
+    .BindTo(Category.Categories)
+)
