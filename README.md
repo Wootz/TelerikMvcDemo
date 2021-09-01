@@ -489,7 +489,7 @@ public class ProductsController : Controller
 ```
 
 ## Grid 進階
-> [ASP.NET MVC5 生命週期](https://docs.microsoft.com/zh-tw/aspnet/mvc/overview/getting-started/lifecycle-of-an-aspnet-mvc-5-application)
+> [淺談 ASP.NET MVC 的生命週期](https://nwpie.blogspot.com/2017/05/5-aspnet-mvc.html)
 
 > ~\Views\Grid\LocalBinding.cshtml
 
@@ -514,7 +514,7 @@ columns
 
 #### 使用 ClientTemplate()
 * **適用於 Remote Binding**
-* 使用 Kento UI Template
+* 使用 Kendo UI Template 語法
 * https://docs.telerik.com/kendo-ui/framework/templates/overview
 ```
 columns
