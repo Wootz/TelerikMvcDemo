@@ -21,7 +21,7 @@
                 columns.Bound(p => p.ProductID).Width(100);
                 columns.Bound(p => p.ProductName).ClientTemplate("#=productNameTemplate(data)#");
                 columns.Bound(p => p.CategoryID).ClientTemplate("#=CategoryName#");
-                columns.Bound(p => p.SubCategoryID).ClientTemplate("#=SubCategoryName#").EditorTemplateName("SubCategory");
+                columns.Bound(p => p.SubCategoryID).ClientTemplate("#=SubCategoryName#").EditorTemplateName("SubCategory").EditorViewData(new { cascadeFrom = "CategoryID" });
                 columns.Bound(p => p.UnitPrice).Width(100);
                 columns.Bound(p => p.UnitsInStock).Width(100);
                 columns.Bound(p => p.UnitsOnOrder).Width(100);

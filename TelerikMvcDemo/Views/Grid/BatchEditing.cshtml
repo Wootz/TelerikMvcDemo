@@ -17,6 +17,7 @@
                 columns.Bound(p => p.SubCategoryID)
                     //.ClientTemplate("#=SubCategoryName#")
                     .EditorTemplateName("SubCategory")
+                    .EditorViewData(new { cascadeFrom = "CategoryID" })
                     .HtmlAttributes(new {​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​ @class = "sub-category-cell" }​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​​);
                 columns.Bound(p => p.UnitPrice).Width(100);
                 columns.Bound(p => p.UnitsInStock).Width(100);
